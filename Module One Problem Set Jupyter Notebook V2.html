@@ -1,0 +1,2031 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head></head><body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    
+    
+
+  <div class="border-box-sizing">
+    <div class="container">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1>Module One Problem Set: Multiple Regression<a rel="noopener" class="anchor-link" href="#Module-One-Problem-Set:-Multiple-Regression">&#182;</a></h1><p>In this notebook, you have been given a set of steps that will show you how to create a multiple regression model in R. It is very important to run the steps in order. Some steps depend on the outputs of earlier steps. Once you have run all the steps, you will be asked to create your own multiple regression model to help you answer the questions in the Module One Problem Set. You are expected to write the R script yourself to answer these questions.</p>
+<p>Reminder: If you have not already reviewed the Problem Set Report template for your Module One Problem Set, be sure to do so now. That will give you an idea of the questions you will need to answer with the outputs of this script. You should use the code you are given as reference when writing your own scripts.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3>Step 1: Loading the Data Set<a rel="noopener" class="anchor-link" href="#Step-1:-Loading-the-Data-Set">&#182;</a></h3><p>You are an analyst working for a car maker. You have access to a set of data that can be used to study the fuel economy of a car. Car makers are interested in studying factors that are associated with better fuel economy. This data set includes several important variables that are associated with fuel economy. You will use this data set to create models to predict fuel economy.</p>
+<p>This block of R code will load the data set from <strong>mtcars.csv</strong> file. Here are the variables contained in the dataset.</p>
+<table>
+<thead><tr>
+<th><div style="text-align: left;"> Variable </div></th>
+<th><div style="text-align: left;"> What does it represent? </div></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><div style="text-align: left;"> mpg </div></td>
+<td><div style="text-align: left;"> Fuel economy in miles/(US) gallon </div></td>
+</tr>
+<tr>
+<td><div style="text-align: left;"> cyl </div></td>
+<td><div style="text-align: left;"> Number of cylinders in car&#39;s engine. Values are (4, 6, 8) </div></td>
+</tr>
+<tr>
+<td><div style="text-align: left;"> disp </div></td>
+<td><div style="text-align: left;"> Displacement (cu.in.) measures overall volume in the engine as a factor of cylinder circumfrance, depth and total number of cylinders. This metric is a good proxy for the total amount of power the engine can generate.</div></td>
+</tr>
+<tr>
+<td><div style="text-align: left;"> hp </div></td>
+<td><div style="text-align: left;"> Gross horsepower measures the theoretical output of an engine’s power output.</div></td>
+</tr>
+<tr>
+<td><div style="text-align: left;"> drat </div></td>
+<td><div style="text-align: left;"> Rear axle ratio indicates the number of turns of the drive shaft for every one rotation of the wheel axle. A vehicle with a high ratio would provide more torque. </div></td>
+</tr>
+<tr>
+<td><div style="text-align: left;"> wt </div></td>
+<td><div style="text-align: left;"> Weight of the car per 1,000 lbs. </div></td>
+</tr>
+<tr>
+<td><div style="text-align: left;"> qsec </div></td>
+<td><div style="text-align: left;"> Quarter mile time is a performance measure of acceleration of the car.</div></td>
+</tr>
+<tr>
+<td><div style="text-align: left;"> vs </div></td>
+<td><div style="text-align: left;"> Engine&#39;s cylinder configuration as V-shaped or straight. Configuration offers trade offs in power/torque, design usage in terms of space/size of engine and performance or center of gravity of vehicle. Values are (0 = V-shaped, 1 = straight) </div></td>
+</tr>
+<tr>
+<td><div style="text-align: left;"> am </div></td>
+<td><div style="text-align: left;"> Automatic or Manual transmission. Values are (0 = automatic, 1 = manual) </div></td>
+</tr>
+<tr>
+<td><div style="text-align: left;"> gear </div></td>
+<td><div style="text-align: left;"> Number of gears in the transmission.</div></td>
+</tr>
+</tbody>
+</table>
+<p>Reference:
+R data sets. (1974). <i>Motor trend car road tests<i> [Data file]. Retrieved from <a rel="noopener" href="https://www.rdocumentation.org/packages/datasets/versions/3.6.2/topics/mtcars">https://www.rdocumentation.org/packages/datasets/versions/3.6.2/topics/mtcars</a></i></i></p><i><i>
+<p>Click the code section below and hit the <strong>Run</strong> button above.</p>
+
+</i></i></div><i><i>
+</i></i></div><i><i>
+</i></i></div><i><i>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># Loading mtcars data set from a mtcars.csv file</span>
+mtcars <span class="o">&lt;-</span> read.csv<span class="p">(</span>file<span class="o">=</span><span class="s">&#39;mtcars.csv&#39;</span><span class="p">,</span> header<span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;,&quot;</span><span class="p">)</span>
+
+<span class="c1"># Converting appropriate variables to factors  </span>
+mtcars2 <span class="o">&lt;-</span> <span class="kp">within</span><span class="p">(</span>mtcars<span class="p">,</span> <span class="p">{</span>
+   vs <span class="o">&lt;-</span> <span class="kp">factor</span><span class="p">(</span>vs<span class="p">)</span>
+   am <span class="o">&lt;-</span> <span class="kp">factor</span><span class="p">(</span>am<span class="p">)</span>
+   cyl  <span class="o">&lt;-</span> <span class="kp">factor</span><span class="p">(</span>cyl<span class="p">)</span>
+   gear <span class="o">&lt;-</span> <span class="kp">factor</span><span class="p">(</span>gear<span class="p">)</span>
+   carb <span class="o">&lt;-</span> <span class="kp">factor</span><span class="p">(</span>carb<span class="p">)</span>
+<span class="p">})</span>
+
+<span class="c1"># Variables and their type</span>
+<span class="kp">print</span><span class="p">(</span><span class="s">&quot;Variables&quot;</span><span class="p">)</span>
+<span class="kp">sapply</span><span class="p">(</span>mtcars2<span class="p">,</span> <span class="kp">class</span><span class="p">)</span>
+
+
+<span class="c1"># Print the data set</span>
+<span class="kp">print</span><span class="p">(</span><span class="s">&quot;dataset&quot;</span><span class="p">)</span>
+mtcars2
+
+
+<span class="c1"># Print the first 10 rows</span>
+<span class="kp">print</span><span class="p">(</span><span class="s">&quot;head&quot;</span><span class="p">)</span>
+<span class="kp">head</span><span class="p">(</span>mtcars2<span class="p">,</span> <span class="m">10</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] &quot;Variables&quot;
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<dl class="dl-horizontal">
+	<dt>car</dt>
+		<dd>&#39;factor&#39;</dd>
+	<dt>mpg</dt>
+		<dd>&#39;numeric&#39;</dd>
+	<dt>cyl</dt>
+		<dd>&#39;factor&#39;</dd>
+	<dt>disp</dt>
+		<dd>&#39;numeric&#39;</dd>
+	<dt>hp</dt>
+		<dd>&#39;integer&#39;</dd>
+	<dt>drat</dt>
+		<dd>&#39;numeric&#39;</dd>
+	<dt>wt</dt>
+		<dd>&#39;numeric&#39;</dd>
+	<dt>qsec</dt>
+		<dd>&#39;numeric&#39;</dd>
+	<dt>vs</dt>
+		<dd>&#39;factor&#39;</dd>
+	<dt>am</dt>
+		<dd>&#39;factor&#39;</dd>
+	<dt>gear</dt>
+		<dd>&#39;factor&#39;</dd>
+	<dt>carb</dt>
+		<dd>&#39;factor&#39;</dd>
+</dl>
+
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] &quot;dataset&quot;
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<table>
+<caption>A data.frame: 32 &#215; 12</caption>
+<thead>
+	<tr><th scope="col">car</th><th scope="col">mpg</th><th scope="col">cyl</th><th scope="col">disp</th><th scope="col">hp</th><th scope="col">drat</th><th scope="col">wt</th><th scope="col">qsec</th><th scope="col">vs</th><th scope="col">am</th><th scope="col">gear</th><th scope="col">carb</th></tr>
+	<tr><th scope="col">&lt;fct&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;fct&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;int&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;fct&gt;</th><th scope="col">&lt;fct&gt;</th><th scope="col">&lt;fct&gt;</th><th scope="col">&lt;fct&gt;</th></tr>
+</thead>
+<tbody>
+	<tr><td>Mazda RX4          </td><td>21.0</td><td>6</td><td>160.0</td><td>110</td><td>3.90</td><td>2.620</td><td>16.46</td><td>0</td><td>1</td><td>4</td><td>4</td></tr>
+	<tr><td>Mazda RX4 Wag      </td><td>21.0</td><td>6</td><td>160.0</td><td>110</td><td>3.90</td><td>2.875</td><td>17.02</td><td>0</td><td>1</td><td>4</td><td>4</td></tr>
+	<tr><td>Datsun 710         </td><td>22.8</td><td>4</td><td>108.0</td><td> 93</td><td>3.85</td><td>2.320</td><td>18.61</td><td>1</td><td>1</td><td>4</td><td>1</td></tr>
+	<tr><td>Hornet 4 Drive     </td><td>21.4</td><td>6</td><td>258.0</td><td>110</td><td>3.08</td><td>3.215</td><td>19.44</td><td>1</td><td>0</td><td>3</td><td>1</td></tr>
+	<tr><td>Hornet Sportabout  </td><td>18.7</td><td>8</td><td>360.0</td><td>175</td><td>3.15</td><td>3.440</td><td>17.02</td><td>0</td><td>0</td><td>3</td><td>2</td></tr>
+	<tr><td>Valiant            </td><td>18.1</td><td>6</td><td>225.0</td><td>105</td><td>2.76</td><td>3.460</td><td>20.22</td><td>1</td><td>0</td><td>3</td><td>1</td></tr>
+	<tr><td>Duster 360         </td><td>14.3</td><td>8</td><td>360.0</td><td>245</td><td>3.21</td><td>3.570</td><td>15.84</td><td>0</td><td>0</td><td>3</td><td>4</td></tr>
+	<tr><td>Merc 240D          </td><td>24.4</td><td>4</td><td>146.7</td><td> 62</td><td>3.69</td><td>3.190</td><td>20.00</td><td>1</td><td>0</td><td>4</td><td>2</td></tr>
+	<tr><td>Merc 230           </td><td>22.8</td><td>4</td><td>140.8</td><td> 95</td><td>3.92</td><td>3.150</td><td>22.90</td><td>1</td><td>0</td><td>4</td><td>2</td></tr>
+	<tr><td>Merc 280           </td><td>19.2</td><td>6</td><td>167.6</td><td>123</td><td>3.92</td><td>3.440</td><td>18.30</td><td>1</td><td>0</td><td>4</td><td>4</td></tr>
+	<tr><td>Merc 280C          </td><td>17.8</td><td>6</td><td>167.6</td><td>123</td><td>3.92</td><td>3.440</td><td>18.90</td><td>1</td><td>0</td><td>4</td><td>4</td></tr>
+	<tr><td>Merc 450SE         </td><td>16.4</td><td>8</td><td>275.8</td><td>180</td><td>3.07</td><td>4.070</td><td>17.40</td><td>0</td><td>0</td><td>3</td><td>3</td></tr>
+	<tr><td>Merc 450SL         </td><td>17.3</td><td>8</td><td>275.8</td><td>180</td><td>3.07</td><td>3.730</td><td>17.60</td><td>0</td><td>0</td><td>3</td><td>3</td></tr>
+	<tr><td>Merc 450SLC        </td><td>15.2</td><td>8</td><td>275.8</td><td>180</td><td>3.07</td><td>3.780</td><td>18.00</td><td>0</td><td>0</td><td>3</td><td>3</td></tr>
+	<tr><td>Cadillac Fleetwood </td><td>10.4</td><td>8</td><td>472.0</td><td>205</td><td>2.93</td><td>5.250</td><td>17.98</td><td>0</td><td>0</td><td>3</td><td>4</td></tr>
+	<tr><td>Lincoln Continental</td><td>10.4</td><td>8</td><td>460.0</td><td>215</td><td>3.00</td><td>5.424</td><td>17.82</td><td>0</td><td>0</td><td>3</td><td>4</td></tr>
+	<tr><td>Chrysler Imperial  </td><td>14.7</td><td>8</td><td>440.0</td><td>230</td><td>3.23</td><td>5.345</td><td>17.42</td><td>0</td><td>0</td><td>3</td><td>4</td></tr>
+	<tr><td>Fiat 128           </td><td>32.4</td><td>4</td><td> 78.7</td><td> 66</td><td>4.08</td><td>2.200</td><td>19.47</td><td>1</td><td>1</td><td>4</td><td>1</td></tr>
+	<tr><td>Honda Civic        </td><td>30.4</td><td>4</td><td> 75.7</td><td> 52</td><td>4.93</td><td>1.615</td><td>18.52</td><td>1</td><td>1</td><td>4</td><td>2</td></tr>
+	<tr><td>Toyota Corolla     </td><td>33.9</td><td>4</td><td> 71.1</td><td> 65</td><td>4.22</td><td>1.835</td><td>19.90</td><td>1</td><td>1</td><td>4</td><td>1</td></tr>
+	<tr><td>Toyota Corona      </td><td>21.5</td><td>4</td><td>120.1</td><td> 97</td><td>3.70</td><td>2.465</td><td>20.01</td><td>1</td><td>0</td><td>3</td><td>1</td></tr>
+	<tr><td>Dodge Challenger   </td><td>15.5</td><td>8</td><td>318.0</td><td>150</td><td>2.76</td><td>3.520</td><td>16.87</td><td>0</td><td>0</td><td>3</td><td>2</td></tr>
+	<tr><td>AMC Javelin        </td><td>15.2</td><td>8</td><td>304.0</td><td>150</td><td>3.15</td><td>3.435</td><td>17.30</td><td>0</td><td>0</td><td>3</td><td>2</td></tr>
+	<tr><td>Camaro Z28         </td><td>13.3</td><td>8</td><td>350.0</td><td>245</td><td>3.73</td><td>3.840</td><td>15.41</td><td>0</td><td>0</td><td>3</td><td>4</td></tr>
+	<tr><td>Pontiac Firebird   </td><td>19.2</td><td>8</td><td>400.0</td><td>175</td><td>3.08</td><td>3.845</td><td>17.05</td><td>0</td><td>0</td><td>3</td><td>2</td></tr>
+	<tr><td>Fiat X1-9          </td><td>27.3</td><td>4</td><td> 79.0</td><td> 66</td><td>4.08</td><td>1.935</td><td>18.90</td><td>1</td><td>1</td><td>4</td><td>1</td></tr>
+	<tr><td>Porsche 914-2      </td><td>26.0</td><td>4</td><td>120.3</td><td> 91</td><td>4.43</td><td>2.140</td><td>16.70</td><td>0</td><td>1</td><td>5</td><td>2</td></tr>
+	<tr><td>Lotus Europa       </td><td>30.4</td><td>4</td><td> 95.1</td><td>113</td><td>3.77</td><td>1.513</td><td>16.90</td><td>1</td><td>1</td><td>5</td><td>2</td></tr>
+	<tr><td>Ford Pantera L     </td><td>15.8</td><td>8</td><td>351.0</td><td>264</td><td>4.22</td><td>3.170</td><td>14.50</td><td>0</td><td>1</td><td>5</td><td>4</td></tr>
+	<tr><td>Ferrari Dino       </td><td>19.7</td><td>6</td><td>145.0</td><td>175</td><td>3.62</td><td>2.770</td><td>15.50</td><td>0</td><td>1</td><td>5</td><td>6</td></tr>
+	<tr><td>Maserati Bora      </td><td>15.0</td><td>8</td><td>301.0</td><td>335</td><td>3.54</td><td>3.570</td><td>14.60</td><td>0</td><td>1</td><td>5</td><td>8</td></tr>
+	<tr><td>Volvo 142E         </td><td>21.4</td><td>4</td><td>121.0</td><td>109</td><td>4.11</td><td>2.780</td><td>18.60</td><td>1</td><td>1</td><td>4</td><td>2</td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] &quot;head&quot;
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<table>
+<caption>A data.frame: 10 &#215; 12</caption>
+<thead>
+	<tr><th scope="col">car</th><th scope="col">mpg</th><th scope="col">cyl</th><th scope="col">disp</th><th scope="col">hp</th><th scope="col">drat</th><th scope="col">wt</th><th scope="col">qsec</th><th scope="col">vs</th><th scope="col">am</th><th scope="col">gear</th><th scope="col">carb</th></tr>
+	<tr><th scope="col">&lt;fct&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;fct&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;int&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;fct&gt;</th><th scope="col">&lt;fct&gt;</th><th scope="col">&lt;fct&gt;</th><th scope="col">&lt;fct&gt;</th></tr>
+</thead>
+<tbody>
+	<tr><td>Mazda RX4        </td><td>21.0</td><td>6</td><td>160.0</td><td>110</td><td>3.90</td><td>2.620</td><td>16.46</td><td>0</td><td>1</td><td>4</td><td>4</td></tr>
+	<tr><td>Mazda RX4 Wag    </td><td>21.0</td><td>6</td><td>160.0</td><td>110</td><td>3.90</td><td>2.875</td><td>17.02</td><td>0</td><td>1</td><td>4</td><td>4</td></tr>
+	<tr><td>Datsun 710       </td><td>22.8</td><td>4</td><td>108.0</td><td> 93</td><td>3.85</td><td>2.320</td><td>18.61</td><td>1</td><td>1</td><td>4</td><td>1</td></tr>
+	<tr><td>Hornet 4 Drive   </td><td>21.4</td><td>6</td><td>258.0</td><td>110</td><td>3.08</td><td>3.215</td><td>19.44</td><td>1</td><td>0</td><td>3</td><td>1</td></tr>
+	<tr><td>Hornet Sportabout</td><td>18.7</td><td>8</td><td>360.0</td><td>175</td><td>3.15</td><td>3.440</td><td>17.02</td><td>0</td><td>0</td><td>3</td><td>2</td></tr>
+	<tr><td>Valiant          </td><td>18.1</td><td>6</td><td>225.0</td><td>105</td><td>2.76</td><td>3.460</td><td>20.22</td><td>1</td><td>0</td><td>3</td><td>1</td></tr>
+	<tr><td>Duster 360       </td><td>14.3</td><td>8</td><td>360.0</td><td>245</td><td>3.21</td><td>3.570</td><td>15.84</td><td>0</td><td>0</td><td>3</td><td>4</td></tr>
+	<tr><td>Merc 240D        </td><td>24.4</td><td>4</td><td>146.7</td><td> 62</td><td>3.69</td><td>3.190</td><td>20.00</td><td>1</td><td>0</td><td>4</td><td>2</td></tr>
+	<tr><td>Merc 230         </td><td>22.8</td><td>4</td><td>140.8</td><td> 95</td><td>3.92</td><td>3.150</td><td>22.90</td><td>1</td><td>0</td><td>4</td><td>2</td></tr>
+	<tr><td>Merc 280         </td><td>19.2</td><td>6</td><td>167.6</td><td>123</td><td>3.92</td><td>3.440</td><td>18.30</td><td>1</td><td>0</td><td>4</td><td>4</td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2>Step 2: Basic Information on the Data Set<a rel="noopener" class="anchor-link" href="#Step-2:-Basic-Information-on-the-Data-Set">&#182;</a></h2><p>In this step, you will use some R functions to obtain basic information on the data set. This includes obtaining the column (variable) names, the total number of variables, and the total number of rows.</p>
+<p>Click the code section below and hit the <strong>Run</strong> button above.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># This prints the column names</span>
+<span class="kp">print</span><span class="p">(</span><span class="s">&quot;names&quot;</span><span class="p">)</span>
+<span class="kp">names</span><span class="p">(</span>mtcars2<span class="p">)</span>
+
+<span class="c1"># Another function that prints the column names</span>
+<span class="kp">print</span><span class="p">(</span><span class="s">&quot;colnames&quot;</span><span class="p">)</span>
+<span class="kp">colnames</span><span class="p">(</span>mtcars2<span class="p">)</span>
+
+<span class="c1"># Total number of columns in the data set</span>
+<span class="kp">print</span><span class="p">(</span><span class="s">&quot;ncol&quot;</span><span class="p">)</span>
+<span class="kp">ncol</span><span class="p">(</span>mtcars2<span class="p">)</span>
+
+<span class="c1"># Total number of rows in the data set</span>
+<span class="kp">print</span><span class="p">(</span><span class="s">&quot;nrow&quot;</span><span class="p">)</span>
+<span class="kp">nrow</span><span class="p">(</span>mtcars2<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] &quot;names&quot;
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<ol class="list-inline">
+	<li>&#39;car&#39;</li>
+	<li>&#39;mpg&#39;</li>
+	<li>&#39;cyl&#39;</li>
+	<li>&#39;disp&#39;</li>
+	<li>&#39;hp&#39;</li>
+	<li>&#39;drat&#39;</li>
+	<li>&#39;wt&#39;</li>
+	<li>&#39;qsec&#39;</li>
+	<li>&#39;vs&#39;</li>
+	<li>&#39;am&#39;</li>
+	<li>&#39;gear&#39;</li>
+	<li>&#39;carb&#39;</li>
+</ol>
+
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] &quot;colnames&quot;
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<ol class="list-inline">
+	<li>&#39;car&#39;</li>
+	<li>&#39;mpg&#39;</li>
+	<li>&#39;cyl&#39;</li>
+	<li>&#39;disp&#39;</li>
+	<li>&#39;hp&#39;</li>
+	<li>&#39;drat&#39;</li>
+	<li>&#39;wt&#39;</li>
+	<li>&#39;qsec&#39;</li>
+	<li>&#39;vs&#39;</li>
+	<li>&#39;am&#39;</li>
+	<li>&#39;gear&#39;</li>
+	<li>&#39;carb&#39;</li>
+</ol>
+
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] &quot;ncol&quot;
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+12
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] &quot;nrow&quot;
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+32
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2>Step 3: Histogram<a rel="noopener" class="anchor-link" href="#Step-3:-Histogram">&#182;</a></h2><p>In this step, you will use the <strong>hist</strong> function in R to print the histogram for the variable <strong>mpg</strong> in the data set.</p>
+<p>Click the block of code below and hit the <strong>Run</strong> button above.<br/>
+NOTE: If the plot is not created, click the code section and hit the <strong>Run</strong> button again.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span>hist<span class="p">(</span>mtcars2<span class="o">$</span>mpg<span class="p">,</span> 
+     main<span class="o">=</span><span class="s">&quot;Histogram for Fuel Economy&quot;</span><span class="p">,</span> 
+     xlab<span class="o">=</span><span class="s">&quot;Miles Per Gallon&quot;</span><span class="p">,</span> 
+     border<span class="o">=</span><span class="s">&quot;blue&quot;</span><span class="p">,</span> 
+     col<span class="o">=</span><span class="s">&quot;green&quot;</span><span class="p">,</span>
+     xlim<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">5</span><span class="p">,</span><span class="m">40</span><span class="p">),</span>
+     ylim<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">5</span><span class="p">),</span>
+     las<span class="o">=</span><span class="m">1</span><span class="p">,</span> 
+     breaks<span class="o">=</span><span class="m">20</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea">
+<img src="javascript://"/>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2>Step 4: Scatterplot<a rel="noopener" class="anchor-link" href="#Step-4:-Scatterplot">&#182;</a></h2><p>In this step, you will use the <strong>plot</strong> function in R to print the scatterplot for the variables <strong>mpg</strong> and <strong>wt</strong> in the data set.</p>
+<p>Click the block of code below and hit the <strong>Run</strong> button above.<br/>
+NOTE: If the plot is not created, click the code section and hit the <strong>Run</strong> button again.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span>plot<span class="p">(</span>mtcars2<span class="o">$</span>wt<span class="p">,</span> mtcars<span class="o">$</span>mpg<span class="p">,</span> 
+     main <span class="o">=</span> <span class="s">&quot;Scatterplot of Fuel Economy against Weight&quot;</span><span class="p">,</span>
+     xlab <span class="o">=</span> <span class="s">&quot;Weight&quot;</span><span class="p">,</span> ylab <span class="o">=</span> <span class="s">&quot;Fuel Economy&quot;</span><span class="p">,</span>
+     xlim<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">8</span><span class="p">),</span>
+     ylim<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">50</span><span class="p">),</span>
+     col<span class="o">=</span><span class="s">&quot;red&quot;</span><span class="p">,</span> 
+     pch <span class="o">=</span> <span class="m">19</span><span class="p">,</span> frame <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea">
+<img src="javascript://"/>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2>Step 5: Subsetting Data and Correlation Matrix<a rel="noopener" class="anchor-link" href="#Step-5:-Subsetting-Data-and-Correlation-Matrix">&#182;</a></h2><p>In this step, you will create a subset of the original data set to select some variables. Then, you will print the correlation matrix for the selected variables.</p>
+<p>Click the block of code below and hit the <strong>Run</strong> button above.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># Selecting mpg, wt, and qsec variables to subset the data</span>
+myvars <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;mpg&quot;</span><span class="p">,</span><span class="s">&quot;wt&quot;</span><span class="p">,</span><span class="s">&quot;qsec&quot;</span><span class="p">)</span>
+mtcars_subset <span class="o">&lt;-</span> mtcars2<span class="p">[</span>myvars<span class="p">]</span>
+
+<span class="c1"># Print the first 10 rows</span>
+<span class="kp">print</span><span class="p">(</span><span class="s">&quot;head&quot;</span><span class="p">)</span>
+<span class="kp">head</span><span class="p">(</span>mtcars_subset<span class="p">,</span> <span class="m">10</span><span class="p">)</span>
+
+<span class="c1"># Print the correlation matrix</span>
+<span class="kp">print</span><span class="p">(</span><span class="s">&quot;cor&quot;</span><span class="p">)</span>
+corr_matrix <span class="o">&lt;-</span> cor<span class="p">(</span>mtcars_subset<span class="p">,</span> method <span class="o">=</span> <span class="s">&quot;pearson&quot;</span><span class="p">)</span>
+<span class="kp">round</span><span class="p">(</span>corr_matrix<span class="p">,</span> <span class="m">4</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] &quot;head&quot;
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<table>
+<caption>A data.frame: 10 &#215; 3</caption>
+<thead>
+	<tr><th scope="col">mpg</th><th scope="col">wt</th><th scope="col">qsec</th></tr>
+	<tr><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;dbl&gt;</th></tr>
+</thead>
+<tbody>
+	<tr><td>21.0</td><td>2.620</td><td>16.46</td></tr>
+	<tr><td>21.0</td><td>2.875</td><td>17.02</td></tr>
+	<tr><td>22.8</td><td>2.320</td><td>18.61</td></tr>
+	<tr><td>21.4</td><td>3.215</td><td>19.44</td></tr>
+	<tr><td>18.7</td><td>3.440</td><td>17.02</td></tr>
+	<tr><td>18.1</td><td>3.460</td><td>20.22</td></tr>
+	<tr><td>14.3</td><td>3.570</td><td>15.84</td></tr>
+	<tr><td>24.4</td><td>3.190</td><td>20.00</td></tr>
+	<tr><td>22.8</td><td>3.150</td><td>22.90</td></tr>
+	<tr><td>19.2</td><td>3.440</td><td>18.30</td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] &quot;cor&quot;
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<table>
+<caption>A matrix: 3 &#215; 3 of type dbl</caption>
+<thead>
+	<tr><th></th><th scope="col">mpg</th><th scope="col">wt</th><th scope="col">qsec</th></tr>
+</thead>
+<tbody>
+	<tr><th scope="row">mpg</th><td> 1.0000</td><td>-0.8677</td><td> 0.4187</td></tr>
+	<tr><th scope="row">wt</th><td>-0.8677</td><td> 1.0000</td><td>-0.1747</td></tr>
+	<tr><th scope="row">qsec</th><td> 0.4187</td><td>-0.1747</td><td> 1.0000</td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2>Step 6: Multiple Regression<a rel="noopener" class="anchor-link" href="#Step-6:-Multiple-Regression">&#182;</a></h2><p>In this step, you will create a multiple regression model for fuel economy as the response variable, and weight and quarter mile time as predictor variables. You will print summary statistics of this model that will help evaluate the significance and utility of the model.</p>
+<p>The general form of this regression model is:</p>
+<p><br/><br/>
+\begin{equation*}
+\large E(y) = {\beta}_0\ +\ {\beta}_1\ {x}_1\ +\ {\beta}_2\ {x}_2
+\end{equation*}
+<br/><br/></p>
+<p>The prediction regression model equation is:</p>
+<p><br/><br/>
+\begin{equation*}
+\large \hat{y} = \hat{{\beta}_0} +\ \hat{{\beta}_1}\ {x}_1\ +\ \hat{{\beta}_2}\ {x}_2
+\end{equation*}
+<br/><br/></p>
+<p>\begin{equation*}
+\text{where } \hat{y} \text{ is the predicted value of the fuel economy,}\ {x}_1\ \text{is weight,}\ {x}_2\ \text{is quarter mile time}
+\end{equation*}</p>
+<p>\begin{equation*}
+\hat{{\beta}_0} \text{,} \hspace{0.25cm} \hat{{\beta}_1} \text{, } \hspace{0.25cm} \hat{{\beta}_2} \text{  } \text{ are estimates of}
+\text{  } {\beta}_0\ \text{,} \hspace{0.25cm} {\beta}_1\ \text{,} \hspace{0.25cm} {\beta}_2\ \text{ respectively  }
+\end{equation*}
+<br/><br/></p>
+<p>Click the block of code below and hit the <strong>Run</strong> button above.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># Create the multiple regression model and print the statistics</span>
+model <span class="o">&lt;-</span> lm<span class="p">(</span>mpg <span class="o">~</span> wt <span class="o">+</span> qsec<span class="p">,</span> data<span class="o">=</span>mtcars_subset<span class="p">)</span>
+<span class="kp">summary</span><span class="p">(</span>model<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+
+<div class="output_text output_subarea">
+<pre>
+Call:
+lm(formula = mpg ~ wt + qsec, data = mtcars_subset)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-4.3962 -2.1431 -0.2129  1.4915  5.7486 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  19.7462     5.2521   3.760 0.000765 ***
+wt           -5.0480     0.4840 -10.430 2.52e-11 ***
+qsec          0.9292     0.2650   3.506 0.001500 ** 
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error: 2.596 on 29 degrees of freedom
+Multiple R-squared:  0.8264,	Adjusted R-squared:  0.8144 
+F-statistic: 69.03 on 2 and 29 DF,  p-value: 9.395e-12
+</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3>Interpretation of Beta Estimates<a rel="noopener" class="anchor-link" href="#Interpretation-of-Beta-Estimates">&#182;</a></h3><p>From the output in previous step, the prediction model equation is:
+<br/><br/>
+\begin{equation*}
+\large \hat{y} = 19.7462\ -\ 5.0480\ {x_1} +\ 0.9292\ {x_2}
+\end{equation*}
+<br/><br/></p>
+<p><strong>Interpret the estimated coefficient of weight variable. </strong></p>
+<ul>
+<li>The estimated coefficient for variable weight is -5.0480. This means that on average, the fuel economy of the car drops (due to the negative sign) by 5.0480 for each 1 unit increase in weight of the car. Note that the variable weight is expressed in 1,000lbs (for example, a weight value of 3.45 in this dataset represents 3,450lbs). A 1 unit increase in weight is equal to 1,000lbs increase, therefore the fuel economy of the car drops by 5.0480 for each 1,000lbs increase in the weight.</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2>Step 7: Fitted Values<a rel="noopener" class="anchor-link" href="#Step-7:-Fitted-Values">&#182;</a></h2><p>In this step, you will obtain the fitted values of the data set. Recall that the fitted value is just the predicted value of the dependent variable (miles per gallon) for data points from the data set.</p>
+<p>Click the block of code below and hit the <strong>Run</strong> button above.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span>fitted_values <span class="o">&lt;-</span> fitted.values<span class="p">(</span>model<span class="p">)</span> 
+fitted_values
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<dl class="dl-horizontal">
+	<dt>1</dt>
+		<dd>21.8151085451276</dd>
+	<dt>2</dt>
+		<dd>21.0482240080608</dd>
+	<dt>3</dt>
+		<dd>25.3272787960526</dd>
+	<dt>4</dt>
+		<dd>21.5805692444496</dd>
+	<dt>5</dt>
+		<dd>18.1961141877544</dd>
+	<dt>6</dt>
+		<dd>21.0685880827163</dd>
+	<dt>7</dt>
+		<dd>16.443422914094</dd>
+	<dt>8</dt>
+		<dd>22.227119662579</dd>
+	<dt>9</dt>
+		<dd>25.1237130826411</dd>
+	<dt>10</dt>
+		<dd>19.3854876016019</dd>
+	<dt>11</dt>
+		<dd>19.9430063893429</dd>
+	<dt>12</dt>
+		<dd>15.3689807707991</dd>
+	<dt>13</dt>
+		<dd>17.2711342408795</dd>
+	<dt>14</dt>
+		<dd>17.3904143335647</dd>
+	<dt>15</dt>
+		<dd>9.95129685919368</dd>
+	<dt>16</dt>
+		<dd>8.92427631744801</dd>
+	<dt>17</dt>
+		<dd>8.95138770226528</dd>
+	<dt>18</dt>
+		<dd>26.7321468964226</dd>
+	<dt>19</dt>
+		<dd>28.8024782757959</dd>
+	<dt>20</dt>
+		<dd>28.9742154513748</dd>
+	<dt>21</dt>
+		<dd>25.896198579936</dd>
+	<dt>22</dt>
+		<dd>17.6528959321916</dd>
+	<dt>23</dt>
+		<dd>18.4815295319477</dd>
+	<dt>24</dt>
+		<dd>14.6809126475119</dd>
+	<dt>25</dt>
+		<dd>16.1795574240899</dd>
+	<dt>26</dt>
+		<dd>27.5402192735221</dd>
+	<dt>27</dt>
+		<dd>24.4611474119887</dd>
+	<dt>28</dt>
+		<dd>27.8120717111451</dd>
+	<dt>29</dt>
+		<dd>17.2174904146097</dd>
+	<dt>30</dt>
+		<dd>20.1658811873154</dd>
+	<dt>31</dt>
+		<dd>15.2912174194292</dd>
+	<dt>32</dt>
+		<dd>22.995915104149</dd>
+</dl>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2>Step 8: Residuals<a rel="noopener" class="anchor-link" href="#Step-8:-Residuals">&#182;</a></h2><p>In this step, you will obtain the residuals. Recall that the residual is the difference between the actual value and the predicted value of the dependent variable (miles per gallon).</p>
+<p>Click the block of code below and hit the <strong>Run</strong> button above.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span>residuals <span class="o">&lt;-</span> residuals<span class="p">(</span>model<span class="p">)</span>
+residuals
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<dl class="dl-horizontal">
+	<dt>1</dt>
+		<dd>-0.815108545127597</dd>
+	<dt>2</dt>
+		<dd>-0.0482240080608019</dd>
+	<dt>3</dt>
+		<dd>-2.52727879605257</dd>
+	<dt>4</dt>
+		<dd>-0.180569244449605</dd>
+	<dt>5</dt>
+		<dd>0.503885812245647</dd>
+	<dt>6</dt>
+		<dd>-2.96858808271634</dd>
+	<dt>7</dt>
+		<dd>-2.14342291409402</dd>
+	<dt>8</dt>
+		<dd>2.17288033742101</dd>
+	<dt>9</dt>
+		<dd>-2.32371308264105</dd>
+	<dt>10</dt>
+		<dd>-0.185487601601898</dd>
+	<dt>11</dt>
+		<dd>-2.14300638934293</dd>
+	<dt>12</dt>
+		<dd>1.03101922920092</dd>
+	<dt>13</dt>
+		<dd>0.0288657591205279</dd>
+	<dt>14</dt>
+		<dd>-2.19041433356467</dd>
+	<dt>15</dt>
+		<dd>0.448703140806316</dd>
+	<dt>16</dt>
+		<dd>1.47572368255199</dd>
+	<dt>17</dt>
+		<dd>5.74861229773472</dd>
+	<dt>18</dt>
+		<dd>5.66785310357742</dd>
+	<dt>19</dt>
+		<dd>1.59752172420408</dd>
+	<dt>20</dt>
+		<dd>4.92578454862522</dd>
+	<dt>21</dt>
+		<dd>-4.39619857993604</dd>
+	<dt>22</dt>
+		<dd>-2.15289593219163</dd>
+	<dt>23</dt>
+		<dd>-3.28152953194772</dd>
+	<dt>24</dt>
+		<dd>-1.38091264751193</dd>
+	<dt>25</dt>
+		<dd>3.02044257591012</dd>
+	<dt>26</dt>
+		<dd>-0.240219273522056</dd>
+	<dt>27</dt>
+		<dd>1.53885258801128</dd>
+	<dt>28</dt>
+		<dd>2.58792828885487</dd>
+	<dt>29</dt>
+		<dd>-1.41749041460968</dd>
+	<dt>30</dt>
+		<dd>-0.465881187315388</dd>
+	<dt>31</dt>
+		<dd>-0.291217419429215</dd>
+	<dt>32</dt>
+		<dd>-1.59591510414898</dd>
+</dl>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2>Step 9: Diagnostic Plots — Residuals against Fitted Values</h2>
+<p>In this step, you will generate a plot of residuals against fitted values to test the assumption of homoscadasticity.</p>
+<p>Click the block of code below and hit the <strong>Run</strong> button above.<br/>
+NOTE: If the plot is not created, click the code section and hit the <strong>Run</strong> button again.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span>plot<span class="p">(</span>fitted_values<span class="p">,</span> residuals<span class="p">,</span> 
+     main <span class="o">=</span> <span class="s">&quot;Residuals against Fitted Values&quot;</span><span class="p">,</span>
+     xlab <span class="o">=</span> <span class="s">&quot;Fitted Values&quot;</span><span class="p">,</span> ylab <span class="o">=</span> <span class="s">&quot;Residuals&quot;</span><span class="p">,</span>
+     col<span class="o">=</span><span class="s">&quot;red&quot;</span><span class="p">,</span> 
+     pch <span class="o">=</span> <span class="m">19</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea">
+<img src="javascript://"/>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2>Step 10: Diagnostic Plots  — Q-Q Plot</h2>
+<p>In this step, you will generate a Q-Q plot to test assumptions of normality of the residuals.</p>
+<p>Click the block of code below and hit the <strong>Run</strong> button above.<br/>
+NOTE: If the plot is not created, click the code section and hit the <strong>Run</strong> button again.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span>qqnorm<span class="p">(</span>residuals<span class="p">,</span> pch <span class="o">=</span> <span class="m">19</span><span class="p">,</span> col<span class="o">=</span><span class="s">&quot;red&quot;</span><span class="p">,</span> frame <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
+qqline<span class="p">(</span>residuals<span class="p">,</span> col <span class="o">=</span> <span class="s">&quot;blue&quot;</span><span class="p">,</span> lwd <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea">
+<img src="javascript://"/>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2>Step 11: Confidence Intervals for Parameter Estimates<a rel="noopener" class="anchor-link" href="#Step-11:-Confidence-Intervals-for-Parameter-Estimates">&#182;</a></h2><p>In this step, you will use the <strong>confint</strong> function to create 90% confidence intervals for the beta parameter estimates.</p>
+<p>Click the block of code below and hit the <strong>Run</strong> button above.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># confidence intervals for model parameters</span>
+<span class="kp">print</span><span class="p">(</span><span class="s">&quot;confint&quot;</span><span class="p">)</span>
+conf_90_int <span class="o">&lt;-</span> confint<span class="p">(</span>model<span class="p">,</span> level<span class="o">=</span><span class="m">0.90</span><span class="p">)</span> 
+<span class="kp">round</span><span class="p">(</span>conf_90_int<span class="p">,</span> <span class="m">4</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] &quot;confint&quot;
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<table>
+<caption>A matrix: 3 &#215; 2 of type dbl</caption>
+<thead>
+	<tr><th></th><th scope="col">5 %</th><th scope="col">95 %</th></tr>
+</thead>
+<tbody>
+	<tr><th scope="row">(Intercept)</th><td>10.8223</td><td>28.6701</td></tr>
+	<tr><th scope="row">wt</th><td>-5.8704</td><td>-4.2256</td></tr>
+	<tr><th scope="row">qsec</th><td> 0.4789</td><td> 1.3795</td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2>Step 12: Predictions, Prediction Interval, and Confidence Interval<a rel="noopener" class="anchor-link" href="#Step-12:-Predictions,-Prediction-Interval,-and-Confidence-Interval">&#182;</a></h2><p>In this step, you will predict the fuel economy for a car that has a weight of 3.88 and qsec of 22.74. You will also obtain a 90% prediction interval and confidence interval for this prediction. Note that this observation is not from the data set that was used to create this model.</p>
+<p>Click the block of code below and hit the <strong>Run</strong> button above.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span>newdata <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p">(</span>wt<span class="o">=</span><span class="m">3.88</span><span class="p">,</span> qsec<span class="o">=</span><span class="m">22.74</span><span class="p">)</span>
+
+<span class="kp">print</span><span class="p">(</span><span class="s">&quot;prediction interval&quot;</span><span class="p">)</span>
+prediction_pred_int <span class="o">&lt;-</span> predict<span class="p">(</span>model<span class="p">,</span> newdata<span class="p">,</span> interval<span class="o">=</span><span class="s">&quot;predict&quot;</span><span class="p">,</span> level<span class="o">=</span><span class="m">0.90</span><span class="p">)</span> 
+<span class="kp">round</span><span class="p">(</span>prediction_pred_int<span class="p">,</span> <span class="m">4</span><span class="p">)</span>
+
+<span class="kp">print</span><span class="p">(</span><span class="s">&quot;confidence interval&quot;</span><span class="p">)</span>
+prediction_conf_int <span class="o">&lt;-</span> predict<span class="p">(</span>model<span class="p">,</span> newdata<span class="p">,</span> interval<span class="o">=</span><span class="s">&quot;confidence&quot;</span><span class="p">,</span> level<span class="o">=</span><span class="m">0.90</span><span class="p">)</span> 
+<span class="kp">round</span><span class="p">(</span>prediction_conf_int<span class="p">,</span> <span class="m">4</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] &quot;prediction interval&quot;
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<table>
+<caption>A matrix: 1 &#215; 3 of type dbl</caption>
+<thead>
+	<tr><th scope="col">fit</th><th scope="col">lwr</th><th scope="col">upr</th></tr>
+</thead>
+<tbody>
+	<tr><td>21.29</td><td>16.2269</td><td>26.3531</td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] &quot;confidence interval&quot;
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<table>
+<caption>A matrix: 1 &#215; 3 of type dbl</caption>
+<thead>
+	<tr><th scope="col">fit</th><th scope="col">lwr</th><th scope="col">upr</th></tr>
+</thead>
+<tbody>
+	<tr><td>21.29</td><td>18.8049</td><td>23.7751</td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2>Your Code<a rel="noopener" class="anchor-link" href="#Your-Code">&#182;</a></h2><p>You have been asked to create a regression model in the Module One Problem Set. Review the Problem Set Report template to see the questions you will be answering about your models.</p>
+<p>Use the empty blocks below to write the R code for your model and get outputs. Then use the outputs to answer the questions in your Problem Set Report.</p>
+<p><strong>Note: Use the + (plus) button to add new code blocks or the scissor icon to remove empty code blocks, if needed.</strong></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># ----- Block 1: Scatterplot of mpg against drat -----</span>
+plot<span class="p">(</span>mtcars2<span class="o">$</span>drat<span class="p">,</span> mtcars2<span class="o">$</span>mpg<span class="p">,</span>
+     main <span class="o">=</span> <span class="s">&quot;Scatterplot of Fuel Economy against Rear Axle Ratio&quot;</span><span class="p">,</span>
+     xlab <span class="o">=</span> <span class="s">&quot;Rear Axle Ratio&quot;</span><span class="p">,</span> ylab <span class="o">=</span> <span class="s">&quot;Fuel Economy&quot;</span><span class="p">,</span>
+     xlim<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span> <span class="m">6</span><span class="p">),</span>
+     ylim<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">50</span><span class="p">),</span>
+     col<span class="o">=</span><span class="s">&quot;red&quot;</span><span class="p">,</span>
+     pch <span class="o">=</span> <span class="m">19</span><span class="p">,</span> frame <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea">
+<img src="javascript://"/>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># ----- Block 2: Scatterplot of mpg against hp -----</span>
+plot<span class="p">(</span>mtcars2<span class="o">$</span>hp<span class="p">,</span> mtcars2<span class="o">$</span>mpg<span class="p">,</span>
+     main <span class="o">=</span> <span class="s">&quot;Scatterplot of Fuel Economy against Horsepower&quot;</span><span class="p">,</span>
+     xlab <span class="o">=</span> <span class="s">&quot;Horsepower&quot;</span><span class="p">,</span> ylab <span class="o">=</span> <span class="s">&quot;Fuel Economy&quot;</span><span class="p">,</span>
+     xlim<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">400</span><span class="p">),</span>
+     ylim<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">50</span><span class="p">),</span>
+     col<span class="o">=</span><span class="s">&quot;red&quot;</span><span class="p">,</span>
+     pch <span class="o">=</span> <span class="m">19</span><span class="p">,</span> frame <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea">
+<img src="javascript://"/>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># ----- Block 3: Subset the data and correlation matrix -----</span>
+myvars2 <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;mpg&quot;</span><span class="p">,</span><span class="s">&quot;drat&quot;</span><span class="p">,</span><span class="s">&quot;hp&quot;</span><span class="p">)</span>
+mtcars_subset2 <span class="o">&lt;-</span> mtcars2<span class="p">[</span>myvars2<span class="p">]</span>
+ 
+<span class="kp">print</span><span class="p">(</span><span class="s">&quot;head&quot;</span><span class="p">)</span>
+<span class="kp">head</span><span class="p">(</span>mtcars_subset2<span class="p">,</span> <span class="m">10</span><span class="p">)</span>
+ 
+<span class="kp">print</span><span class="p">(</span><span class="s">&quot;cor&quot;</span><span class="p">)</span>
+corr_matrix2 <span class="o">&lt;-</span> cor<span class="p">(</span>mtcars_subset2<span class="p">,</span> method <span class="o">=</span> <span class="s">&quot;pearson&quot;</span><span class="p">)</span>
+<span class="kp">round</span><span class="p">(</span>corr_matrix2<span class="p">,</span> <span class="m">4</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] &quot;head&quot;
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<table>
+<caption>A data.frame: 10 &#215; 3</caption>
+<thead>
+	<tr><th scope="col">mpg</th><th scope="col">drat</th><th scope="col">hp</th></tr>
+	<tr><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+	<tr><td>21.0</td><td>3.90</td><td>110</td></tr>
+	<tr><td>21.0</td><td>3.90</td><td>110</td></tr>
+	<tr><td>22.8</td><td>3.85</td><td> 93</td></tr>
+	<tr><td>21.4</td><td>3.08</td><td>110</td></tr>
+	<tr><td>18.7</td><td>3.15</td><td>175</td></tr>
+	<tr><td>18.1</td><td>2.76</td><td>105</td></tr>
+	<tr><td>14.3</td><td>3.21</td><td>245</td></tr>
+	<tr><td>24.4</td><td>3.69</td><td> 62</td></tr>
+	<tr><td>22.8</td><td>3.92</td><td> 95</td></tr>
+	<tr><td>19.2</td><td>3.92</td><td>123</td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] &quot;cor&quot;
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<table>
+<caption>A matrix: 3 &#215; 3 of type dbl</caption>
+<thead>
+	<tr><th></th><th scope="col">mpg</th><th scope="col">drat</th><th scope="col">hp</th></tr>
+</thead>
+<tbody>
+	<tr><th scope="row">mpg</th><td> 1.0000</td><td> 0.6812</td><td>-0.7762</td></tr>
+	<tr><th scope="row">drat</th><td> 0.6812</td><td> 1.0000</td><td>-0.4488</td></tr>
+	<tr><th scope="row">hp</th><td>-0.7762</td><td>-0.4488</td><td> 1.0000</td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[16]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># ----- Block 4: Multiple regression model -----</span>
+model2 <span class="o">&lt;-</span> lm<span class="p">(</span>mpg <span class="o">~</span> drat <span class="o">+</span> hp<span class="p">,</span> data<span class="o">=</span>mtcars_subset2<span class="p">)</span>
+<span class="kp">summary</span><span class="p">(</span>model2<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+
+<div class="output_text output_subarea">
+<pre>
+Call:
+lm(formula = mpg ~ drat + hp, data = mtcars_subset2)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-5.0369 -2.3487 -0.6034  1.1897  7.7500 
+
+Coefficients:
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 10.789861   5.077752   2.125 0.042238 *  
+drat         4.698158   1.191633   3.943 0.000467 ***
+hp          -0.051787   0.009293  -5.573 5.17e-06 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error: 3.17 on 29 degrees of freedom
+Multiple R-squared:  0.7412,	Adjusted R-squared:  0.7233 
+F-statistic: 41.52 on 2 and 29 DF,  p-value: 3.081e-09
+</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[17]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># ----- Block 5: Fitted values and residuals -----</span>
+fitted_values2 <span class="o">&lt;-</span> fitted.values<span class="p">(</span>model2<span class="p">)</span>
+fitted_values2
+ 
+residuals2 <span class="o">&lt;-</span> residuals<span class="p">(</span>model2<span class="p">)</span>
+residuals2
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<dl class="dl-horizontal">
+	<dt>1</dt>
+		<dd>23.4161449752737</dd>
+	<dt>2</dt>
+		<dd>23.4161449752737</dd>
+	<dt>3</dt>
+		<dd>24.0616101404034</dd>
+	<dt>4</dt>
+		<dd>19.5636556093935</dd>
+	<dt>5</dt>
+		<dd>16.5263943902309</dd>
+	<dt>6</dt>
+		<dd>18.3191783761162</dd>
+	<dt>7</dt>
+		<dd>13.183218342467</dd>
+	<dt>8</dt>
+		<dd>24.9152910542856</dd>
+	<dt>9</dt>
+		<dd>24.2869078834447</dd>
+	<dt>10</dt>
+		<dd>22.8368816780207</dd>
+	<dt>11</dt>
+		<dd>22.8368816780207</dd>
+	<dt>12</dt>
+		<dd>15.8916085182009</dd>
+	<dt>13</dt>
+		<dd>15.8916085182009</dd>
+	<dt>14</dt>
+		<dd>15.8916085182009</dd>
+	<dt>15</dt>
+		<dd>13.9392001765004</dd>
+	<dt>16</dt>
+		<dd>13.7502047179921</dd>
+	<dt>17</dt>
+		<dd>14.0539812506381</dd>
+	<dt>18</dt>
+		<dd>26.5404259811854</dd>
+	<dt>19</dt>
+		<dd>31.2588731826756</dd>
+	<dt>20</dt>
+		<dd>27.2499547182367</dd>
+	<dt>21</dt>
+		<dd>23.1497398751383</dd>
+	<dt>22</dt>
+		<dd>15.9887791173991</dd>
+	<dt>23</dt>
+		<dd>17.8210606450738</dd>
+	<dt>24</dt>
+		<dd>15.6262603793666</dd>
+	<dt>25</dt>
+		<dd>16.1975233468021</dd>
+	<dt>26</dt>
+		<dd>26.5404259811854</dd>
+	<dt>27</dt>
+		<dd>26.8901149434865</dd>
+	<dt>28</dt>
+		<dd>22.6500245154676</dd>
+	<dt>29</dt>
+		<dd>16.9444113296875</dd>
+	<dt>30</dt>
+		<dd>18.7345285389671</dd>
+	<dt>31</dt>
+		<dd>10.0728118869113</dd>
+	<dt>32</dt>
+		<dd>24.4545447557537</dd>
+</dl>
+
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<dl class="dl-horizontal">
+	<dt>1</dt>
+		<dd>-2.41614497527371</dd>
+	<dt>2</dt>
+		<dd>-2.41614497527366</dd>
+	<dt>3</dt>
+		<dd>-1.26161014040338</dd>
+	<dt>4</dt>
+		<dd>1.83634439060645</dd>
+	<dt>5</dt>
+		<dd>2.1736056097691</dd>
+	<dt>6</dt>
+		<dd>-0.219178376116217</dd>
+	<dt>7</dt>
+		<dd>1.11678165753301</dd>
+	<dt>8</dt>
+		<dd>-0.515291054285585</dd>
+	<dt>9</dt>
+		<dd>-1.48690788344475</dd>
+	<dt>10</dt>
+		<dd>-3.63688167802074</dd>
+	<dt>11</dt>
+		<dd>-5.03688167802074</dd>
+	<dt>12</dt>
+		<dd>0.508391481799147</dd>
+	<dt>13</dt>
+		<dd>1.40839148179915</dd>
+	<dt>14</dt>
+		<dd>-0.691608518200852</dd>
+	<dt>15</dt>
+		<dd>-3.53920017650041</dd>
+	<dt>16</dt>
+		<dd>-3.35020471799206</dd>
+	<dt>17</dt>
+		<dd>0.646018749361919</dd>
+	<dt>18</dt>
+		<dd>5.85957401881458</dd>
+	<dt>19</dt>
+		<dd>-0.858873182675586</dd>
+	<dt>20</dt>
+		<dd>6.65004528176329</dd>
+	<dt>21</dt>
+		<dd>-1.64973987513826</dd>
+	<dt>22</dt>
+		<dd>-0.488779117399069</dd>
+	<dt>23</dt>
+		<dd>-2.62106064507376</dd>
+	<dt>24</dt>
+		<dd>-2.32626037936658</dd>
+	<dt>25</dt>
+		<dd>3.00247665319789</dd>
+	<dt>26</dt>
+		<dd>0.759574018814585</dd>
+	<dt>27</dt>
+		<dd>-0.890114943486505</dd>
+	<dt>28</dt>
+		<dd>7.74997548453238</dd>
+	<dt>29</dt>
+		<dd>-1.14441132968754</dd>
+	<dt>30</dt>
+		<dd>0.965471461032935</dd>
+	<dt>31</dt>
+		<dd>4.92718811308872</dd>
+	<dt>32</dt>
+		<dd>-3.05454475575375</dd>
+</dl>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[18]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># ----- Block 6: Residuals against fitted values -----</span>
+plot<span class="p">(</span>fitted_values2<span class="p">,</span> residuals2<span class="p">,</span>
+     main <span class="o">=</span> <span class="s">&quot;Residuals against Fitted Values&quot;</span><span class="p">,</span>
+     xlab <span class="o">=</span> <span class="s">&quot;Fitted Values&quot;</span><span class="p">,</span> ylab <span class="o">=</span> <span class="s">&quot;Residuals&quot;</span><span class="p">,</span>
+     col<span class="o">=</span><span class="s">&quot;red&quot;</span><span class="p">,</span>
+     pch <span class="o">=</span> <span class="m">19</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea">
+<img src="javascript://"/>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[19]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># ----- Block 7: Normal Q-Q plot -----</span>
+qqnorm<span class="p">(</span>residuals2<span class="p">,</span> pch <span class="o">=</span> <span class="m">19</span><span class="p">,</span> col<span class="o">=</span><span class="s">&quot;red&quot;</span><span class="p">,</span> frame <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
+qqline<span class="p">(</span>residuals2<span class="p">,</span> col <span class="o">=</span> <span class="s">&quot;blue&quot;</span><span class="p">,</span> lwd <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea">
+<img src="javascript://"/>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[20]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># ----- Block 8: 95% confidence intervals for parameters -----</span>
+<span class="kp">print</span><span class="p">(</span><span class="s">&quot;confint&quot;</span><span class="p">)</span>
+conf_95_int <span class="o">&lt;-</span> confint<span class="p">(</span>model2<span class="p">,</span> level<span class="o">=</span><span class="m">0.95</span><span class="p">)</span>
+<span class="kp">round</span><span class="p">(</span>conf_95_int<span class="p">,</span> <span class="m">4</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] &quot;confint&quot;
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<table>
+<caption>A matrix: 3 &#215; 2 of type dbl</caption>
+<thead>
+	<tr><th></th><th scope="col">2.5 %</th><th scope="col">97.5 %</th></tr>
+</thead>
+<tbody>
+	<tr><th scope="row">(Intercept)</th><td> 0.4047</td><td>21.1750</td></tr>
+	<tr><th scope="row">drat</th><td> 2.2610</td><td> 7.1353</td></tr>
+	<tr><th scope="row">hp</th><td>-0.0708</td><td>-0.0328</td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[21]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># ----- Block 9: Prediction for drat=3.15, hp=120 -----</span>
+newdata2 <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p">(</span>drat<span class="o">=</span><span class="m">3.15</span><span class="p">,</span> hp<span class="o">=</span><span class="m">120</span><span class="p">)</span>
+ 
+<span class="kp">print</span><span class="p">(</span><span class="s">&quot;prediction interval&quot;</span><span class="p">)</span>
+prediction_pred_int2 <span class="o">&lt;-</span> predict<span class="p">(</span>model2<span class="p">,</span> newdata2<span class="p">,</span> interval<span class="o">=</span><span class="s">&quot;predict&quot;</span><span class="p">,</span> level<span class="o">=</span><span class="m">0.95</span><span class="p">)</span>
+<span class="kp">round</span><span class="p">(</span>prediction_pred_int2<span class="p">,</span> <span class="m">4</span><span class="p">)</span>
+ 
+<span class="kp">print</span><span class="p">(</span><span class="s">&quot;confidence interval&quot;</span><span class="p">)</span>
+prediction_conf_int2 <span class="o">&lt;-</span> predict<span class="p">(</span>model2<span class="p">,</span> newdata2<span class="p">,</span> interval<span class="o">=</span><span class="s">&quot;confidence&quot;</span><span class="p">,</span> level<span class="o">=</span><span class="m">0.95</span><span class="p">)</span>
+<span class="kp">round</span><span class="p">(</span>prediction_conf_int2<span class="p">,</span> <span class="m">4</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] &quot;prediction interval&quot;
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<table>
+<caption>A matrix: 1 &#215; 3 of type dbl</caption>
+<thead>
+	<tr><th scope="col">fit</th><th scope="col">lwr</th><th scope="col">upr</th></tr>
+</thead>
+<tbody>
+	<tr><td>19.3747</td><td>12.6449</td><td>26.1045</td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] &quot;confidence interval&quot;
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea">
+<table>
+<caption>A matrix: 1 &#215; 3 of type dbl</caption>
+<thead>
+	<tr><th scope="col">fit</th><th scope="col">lwr</th><th scope="col">upr</th></tr>
+</thead>
+<tbody>
+	<tr><td>19.3747</td><td>17.5716</td><td>21.1777</td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2>End of Module One Jupyter Notebook<a rel="noopener" class="anchor-link" href="#End-of-Module-One-Jupyter-Notebook">&#182;</a></h2><p>Attach the HTML output along with your problem set report for the Module One Problem Set. The HTML output can be downloaded by clicking <strong>File</strong>, then <strong>Download as</strong>, then <strong>HTML</strong>. Be sure to answer all of the questions in your problem set report.</p>
+
+</div>
+</div>
+</div>
+    </i></i></div><i><i>
+  </i></i></div><i><i>
+</i></i><i><i>
+
+ 
+
+
+</i></i><i><i>
+</i></i><script type="module" src="https://s.brightspace.com/lib/bsi/2026.7.210/unbundled/mathjax.js"></script><script type="text/javascript">document.addEventListener('DOMContentLoaded', function() {
+					if (document.querySelector('math, .d2l-element, .d2l-cplus-layout') || /\$\$|\\\(|\\\[|\\begin{|\\ref{|\\eqref{/.test(document.body.innerHTML)) {
+						document.querySelectorAll('mspace[linebreak="newline"]').forEach(elm => {
+							elm.setAttribute('style', 'display: block; height: 0.5rem;');
+						});
+
+						document.querySelectorAll('math mmultiscripts > none').forEach(elm => {
+							const mrow = document.createElementNS('http://www.w3.org/1998/Math/MathML', 'mrow');
+							elm.replaceWith(mrow);
+						});
+
+						window.D2L.MathJax.loadMathJax({
+							outputScale: 1.5,
+							renderLatex: false,
+							enableMML3Support: false
+						});
+					}
+				});</script><script type="module" src="https://s.brightspace.com/lib/bsi/2026.7.210/unbundled/prism.js"></script><script type="text/javascript">document.addEventListener('DOMContentLoaded', function() {
+					document.querySelectorAll('.d2l-code').forEach(code => {
+						window.D2L.Prism.formatCodeElement(code);
+					});
+				});</script><script type="module" src="https://s.brightspace.com/lib/bsi/2026.7.210/unbundled/embeds.js"></script><script type="text/javascript">document.addEventListener('DOMContentLoaded', function() {
+					window.D2L.EmbedRenderer.renderEmbeds(document.body);
+				});</script></body></html>
